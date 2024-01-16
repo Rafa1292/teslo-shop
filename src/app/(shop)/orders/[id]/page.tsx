@@ -13,7 +13,7 @@ interface Props {
   }
 }
 
-export default function ( {params:{id}} : Props) {
+export default function OrderByIdPage( {params:{id}} : Props) {
   return (
     <div className='flex justify-center items-center mb-72 px-8 lg:px-0'>
       <div className='flex flex-col w-[1000px]'>

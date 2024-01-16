@@ -9,7 +9,7 @@ interface Props {
   }
 }
 
-export default function ({ params: { slug } }: Props) {
+export default function ProductBySlugPage ({ params: { slug } }: Props) {
   const product = initialData.products.find((p) => p.slug === slug)
 
   if (!product) notFound()
