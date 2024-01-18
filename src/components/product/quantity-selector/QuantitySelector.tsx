@@ -2,7 +2,7 @@
 import { IoAddCircleOutline, IoRemoveCircleOutline } from 'react-icons/io5'
 
 interface Props {
-  stock: number
+  stock?: number
   quantity: number
   onQuantityChange: (value: number) => void
 }
@@ -10,7 +10,8 @@ export const QuantitySelector = ({ quantity, onQuantityChange, stock }: Props) =
 
   const onValueChange = (value: number) => {
     const newQuantity = quantity + value
-    if (newQuantity < 1 || newQuantity > stock) return
+    const isOutOfStock = stock === undefined ? false :(stock + newQuantity) > stock
+    if (newQuantity < 1 || isOutOfStock) return
     onQuantityChange(newQuantity)
   }
 
