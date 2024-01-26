@@ -22,6 +22,7 @@ export const authConfig: NextAuthConfig = {
       if (session.user) {
         const user = await getUserByEmail(session.user.email)
         session.user.role = user !== null ? user.role : ''
+        session.user.id = user !== null ? user.id : ''
       }
       return session
     },
