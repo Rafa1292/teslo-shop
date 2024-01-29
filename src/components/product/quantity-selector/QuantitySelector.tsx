@@ -10,8 +10,8 @@ export const QuantitySelector = ({ quantity, onQuantityChange, stock }: Props) =
 
   const onValueChange = (value: number) => {
     const newQuantity = quantity + value
-    const isOutOfStock = stock === undefined ? false :(stock + newQuantity) > stock
-    if (newQuantity < 1 || isOutOfStock) return
+    if (stock === undefined) return
+    if (newQuantity < 1 || newQuantity > stock) return
     onQuantityChange(newQuantity)
   }
 
