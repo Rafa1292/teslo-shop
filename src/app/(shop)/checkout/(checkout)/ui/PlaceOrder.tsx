@@ -1,16 +1,21 @@
 'use client'
 
+import { placeOrder } from "@/actions"
 import { useAddressStore, useCartStore } from "@/store"
 import { currencyFormat } from "@/utils"
 import clsx from "clsx"
+import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
 export const PlaceOrder = () => {
+  const router = useRouter()
   const { subtotal, tax, itemsInCart, total } = useCartStore((state) => state.getSummaryInformation())
+  const [errorMessage, setErrorMessage] = useState('')
   const [loaded, setLoaded] = useState(false)
   const address = useAddressStore((state) => state.address)
   const [isPlacinOrder, setIsPlacingOrder] = useState(false)
   const cart = useCartStore((state) => state.cart)
+  const clearCart = useCartStore((state) => state.clearCart)
 
   useEffect(() => {
 
@@ -24,8 +29,15 @@ export const PlaceOrder = () => {
       size: item.size
     }))
     setIsPlacingOrder(true)
-    console.log(productsToOrder)
-    setIsPlacingOrder(false)
+    const resp = await placeOrder(productsToOrder, address)
+    if(!resp.ok) {
+      setErrorMessage(resp.message)
+      setIsPlacingOrder(false)
+      return
+    }
+
+    clearCart()
+    router.replace(`/orders/${resp.order?.id}`)
   }
 
   if(!loaded) return (
@@ -64,7 +76,7 @@ export const PlaceOrder = () => {
           Al hacer click en &quot;Finalizar&quot;, aceptas los <a href='#' className='underline'>terminos y condiciones de compra</a>
         </span>
       </p>
-      {/* <p className="text-red-500 ">Error  de creacion</p> */}
+      <p className="text-red-500 ">{errorMessage}</p>
       <button
       onClick={onPlaceOrder}
       className={
