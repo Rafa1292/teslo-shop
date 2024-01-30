@@ -76,7 +76,8 @@ export const Sidebar = () => {
               <span className='ml-2 text-xl'>Perfil</span>
             </Link>
             <Link
-              href={'/'}
+              onClick={() => toggleMenu()}
+              href={'/orders'}
               className='flex items-center mt-10 p-2 hover:bg-gray-100 rounded transition-all cursor-pointer'
             >
               <IoTicketOutline size={30} />
