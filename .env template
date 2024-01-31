@@ -1,6 +1,8 @@
 DB_USER=postgres
 DB_NAME=teslo-shop
 DB_PASSWORD=admin123
+AUTH_SECRET="HqftlxHDTplGrUNIffkn7isUw29yRmnRK8gGPG5PIno="
+
 
 # This was inserted by `prisma init`:
 # Environment variables declared in this file are automatically made available to Prisma.
@@ -10,3 +12,10 @@ DB_PASSWORD=admin123
 # See the documentation for all the connection string options: https://pris.ly/d/connection-strings
 
 DATABASE_URL="postgresql://postgres:admin123D@localhost:8432/teslo-shop?schema=public"
+
+# paypal
+# https://developer.paypal.com/dashboard/
+
+
+NEXT_PUBLIC_PAYPAL_CLIENT_ID=
+PAYPAL_SECRET=

@@ -1,10 +1,9 @@
 import { getOrderById } from '@/actions'
-import { Title } from '@/components'
+import { PaypalButton, Title } from '@/components'
 import { initialData } from '@/seed/seed'
 import { currencyFormat } from '@/utils'
 import clsx from 'clsx'
 import Image from 'next/image'
-import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { IoCardOutline } from 'react-icons/io5'
 
@@ -90,15 +89,7 @@ export default async function OrderByIdPage({ params: { id } }: Props) {
               <span className='mt-5 text-2xl text-right'>{currencyFormat(order!.total)}</span>
             </div>
             <div className='mt-5 mb-2 w-full'>
-              <div
-                className={clsx('flex items-center rounded-lg py-2 px-3.5 text-xs font-bold text-white mb-5', {
-                  'bg-red-500': !order!.isPaid,
-                  'bg-green-700': order!.isPaid,
-                })}
-              >
-                <IoCardOutline size={20} className='mr-2' />
-                <span className='mx-2'>Pago {order!.isPaid ? 'realizado' : 'pendiente'}</span>
-              </div>
+              <PaypalButton amount={order!.total} orderId={order!.id}/>
             </div>
           </div>
         </div>
