@@ -1,14 +1,17 @@
 'use server'
 
-import { PayPalOrderStatusResponse } from "@/interfaces"
+import { PayPalOrderStatusResponse } from '@/interfaces'
+import prisma from '@/lib/prisma'
+import { revalidatePath } from 'next/cache'
 
 export const paypalCheckPayment = async (paypalTransactionId: string) => {
-  const accesToken = await getPayPalBearerToken()
-  if (!accesToken)
-    return {
-      ok: false,
-      message: 'No se pudo obtener el token de acceso',
-    }
+  try {
+    const accesToken = await getPayPalBearerToken()
+    if (!accesToken)
+      return {
+        ok: false,
+        message: 'No se pudo obtener el token de acceso',
+      }
 
     const payment = await verifyPayPalPayment(paypalTransactionId, accesToken)
 
@@ -19,9 +22,37 @@ export const paypalCheckPayment = async (paypalTransactionId: string) => {
       }
 
     const { status, purchase_units } = payment
-    // const { amount } = purchase_units[0]
+    const { invoice_id: orderId } = purchase_units[0]
 
-    console.log(payment)
+    if (status !== 'COMPLETED')
+      return {
+        ok: false,
+        message: 'El pago no se ha completado',
+      }
+
+    await  prisma.order.update({
+      where: {
+        id: orderId
+      },
+      data: {
+        isPaid: true
+      }
+    })
+
+    revalidatePath(`/orders/${orderId}`)
+
+    return {
+      ok: true,
+      message: 'Pago verificado',
+    }
+
+  } catch (error) {
+    console.error(error)
+    return {
+      ok: false,
+      message: 'Ocurrió un error al verificar el pago',
+    }
+  }
 }
 
 const getPayPalBearerToken = async (): Promise<string | null> => {
@@ -32,6 +63,7 @@ const getPayPalBearerToken = async (): Promise<string | null> => {
 
     const response = await fetch('https://api.sandbox.paypal.com/v1/oauth2/token', {
       method: 'POST',
+      cache: 'no-store',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
         Authorization: `Basic ${encoded}`,
@@ -47,10 +79,14 @@ const getPayPalBearerToken = async (): Promise<string | null> => {
   }
 }
 
-const verifyPayPalPayment = async (payPalTransactionId: string, accessToken: string): Promise<PayPalOrderStatusResponse|null> => {
+const verifyPayPalPayment = async (
+  payPalTransactionId: string,
+  accessToken: string
+): Promise<PayPalOrderStatusResponse | null> => {
   try {
     const response = await fetch(`https://api.sandbox.paypal.com/v2/checkout/orders/${payPalTransactionId}`, {
       method: 'GET',
+      cache: 'no-store',
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },

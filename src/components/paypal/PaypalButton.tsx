@@ -13,12 +13,12 @@ export const PaypalButton = ({ amount, orderId }: Props) => {
   const [{ isPending }] = usePayPalScriptReducer()
   const roundedAmount = Math.round(amount * 100) / 100
 
-  console.log('roundedAmount', roundedAmount)
 
   const createOrder = async (data: CreateOrderData, actions: CreateOrderActions): Promise<string> => {
     const transactionId = await actions.order.create({
       purchase_units: [
         {
+          invoice_id: orderId,
           amount: {
             value: roundedAmount.toString(),
           },
