@@ -1,3 +1,4 @@
+export * from './products/delete-product-image'
 export * from './products/product-pagination'
 export * from './products/create-update-product'
 export * from './products/get-product-by-slug'

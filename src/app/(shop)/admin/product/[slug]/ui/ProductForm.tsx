@@ -1,14 +1,16 @@
 'use client'
 
-import { createUpdateProduct, getCategories } from '@/actions'
+import { createUpdateProduct, deleteProductImage, getCategories } from '@/actions'
+import { ProductImage } from '@/components'
 import { Category, Product, ProductCategory } from '@/interfaces'
-import { ProductImage } from '@prisma/client'
+import { ProductImage as ProductWithImage } from '@prisma/client'
 import clsx from 'clsx'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 
 interface Props {
-  product: Product & { ProductImage?: ProductImage[] }
+  product: Partial<Product> & { ProductImage?: ProductWithImage[] }
   categories: ProductCategory[]
 }
 
@@ -25,21 +27,24 @@ interface FormInputs {
   tags: string
   gender: Category
   categoryId: string
+  images?: FileList
 }
 
 export const ProductForm = ({ product, categories }: Props) => {
+  const router = useRouter()
   const {
     handleSubmit,
     register,
     formState: { isValid },
     getValues,
     setValue,
-    watch
+    watch,
   } = useForm<FormInputs>({
     defaultValues: {
       ...product,
-      tags: product.tags.join(', '),
+      tags: product.tags?.join(', '),
       sizes: product.sizes ?? [],
+      images: undefined
     },
   })
 
@@ -47,10 +52,11 @@ export const ProductForm = ({ product, categories }: Props) => {
 
   const onSubmit = async (data: FormInputs) => {
     const formData = new FormData()
-    const {...productToSave} = data
+    const { images, ...productToSave } = data
 
-
-    formData.append('id', product.id ?? '')
+    if (product.id) {
+      formData.append('id', productToSave.id)
+    }
     formData.append('title', productToSave.title)
     formData.append('slug', productToSave.slug)
     formData.append('description', productToSave.description)
@@ -61,8 +67,17 @@ export const ProductForm = ({ product, categories }: Props) => {
     formData.append('categoryId', productToSave.categoryId)
     formData.append('gender', productToSave.gender)
 
+    if (images) {
+      for (let i = 0; i < images.length; i++) {
+        formData.append('images', images[i])
+      }
+    }
 
-    await createUpdateProduct(formData)
+    const { ok } = await createUpdateProduct(formData)
+
+    if (ok) {
+      router.push(`/admin/product/${productToSave.slug}`)
+    }
   }
 
   const onSizeChange = (size: string) => {
@@ -74,7 +89,6 @@ export const ProductForm = ({ product, categories }: Props) => {
     }
 
     setValue('sizes', Array.from(sizes))
-
   }
 
   return (
@@ -142,6 +156,14 @@ export const ProductForm = ({ product, categories }: Props) => {
 
       {/* Selector de tallas y fotos */}
       <div className='w-full'>
+        <div className='flex flex-col mb-2'>
+          <span>Inventario</span>
+          <input
+            {...register('inStock', { required: true, min: 0 })}
+            type='number'
+            className='p-2 border rounded-md bg-gray-200'
+          />
+        </div>
         {/* As checkboxes */}
         <div className='flex flex-col'>
           <span>Tallas</span>
@@ -162,20 +184,20 @@ export const ProductForm = ({ product, categories }: Props) => {
 
           <div className='flex flex-col mb-2'>
             <span>Fotos</span>
-            <input type='file' multiple className='p-2 border rounded-md bg-gray-200' accept='image/png, image/jpeg' />
+            <input type='file' {...register('images')} multiple className='p-2 border rounded-md bg-gray-200' accept='image/png, image/jpeg, image/avif' />
           </div>
 
           <div className='grid grid-cols-1 sm:grid-cols-3 gap-3'>
             {product.ProductImage?.map((image) => (
               <div key={image.id}>
-                <Image
-                  src={`/products/${image.url}`}
+                <ProductImage
+                  src={`${image.url}`}
                   width={300}
                   height={300}
-                  alt={product.title}
+                  alt={product.title ?? ''}
                   className='shadow-sm object-cover rounded-t-md'
                 />
-                <button type='button' className='btn-danger w-full rounded-b-md rounded-t-none'>
+                <button type='button' onClick={ ()=> deleteProductImage(image.url, image.id)} className='btn-danger w-full rounded-b-md rounded-t-none'>
                   Eliminar
                 </button>
               </div>

@@ -19,3 +19,4 @@ DATABASE_URL="postgresql://postgres:admin123D@localhost:8432/teslo-shop?schema=p
 
 NEXT_PUBLIC_PAYPAL_CLIENT_ID=
 PAYPAL_SECRET=
+CLOUDINARY_URL=
