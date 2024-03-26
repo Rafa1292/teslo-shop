@@ -1,3 +1,5 @@
+'use server'
+
 export const revalidate = 60
 
 import { getPaginatedProducts } from '@/actions'
@@ -11,7 +13,7 @@ interface Props {
   }
 }
 
-export default async function Home({ searchParams }: Props) {
+export default async function Page({ searchParams }: Props) {
   const page = searchParams.page ? parseInt(searchParams.page) : 1
   const limit = searchParams.limit ? parseInt(searchParams.limit) : 12
 
