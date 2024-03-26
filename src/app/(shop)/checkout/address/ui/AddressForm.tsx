@@ -49,7 +49,7 @@ export const AddressForm = ({countries = [], userStoreAddress}:Props) => {
       reset(address)
     }
     
-  }, [])
+  })
   
 
   const onSubmit = async (data: FormInputs) => {
