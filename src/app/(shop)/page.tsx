@@ -17,14 +17,28 @@ export default async function Page({ searchParams }: Props) {
   const page = searchParams.page ? parseInt(searchParams.page) : 1
   const limit = searchParams.limit ? parseInt(searchParams.limit) : 12
 
-  const { products, currentPage, totalPages } = await getPaginatedProducts({ page, take: limit })
+  // const data = async ()=> {
+  //   try {
+  //     const {products,  totalPages} = await getPaginatedProducts({ page, take: limit })
+  //     return {
+  //       products,
+  //       totalPages
+  //     }
+  //   } catch (error) {
+  //     return {
+  //       products: [],
+  //       totalPages: 1
+  //     }
+      
+  //   }
+  // }
 
-  if( products.length === 0 ) redirect('/')
+  // if( data.products.length === 0 ) redirect('/')
   return (
     <>
       <Title title='Tienda' subtitle='Todos los productos' />
-      <ProductGrid products={products} />
-      <Pagination  totalPages={totalPages} />
+      <ProductGrid products={[]} />
+      <Pagination  totalPages={1} />
     </>
   )
 }
