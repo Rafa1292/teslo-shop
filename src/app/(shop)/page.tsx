@@ -13,7 +13,7 @@ interface Props {
   }
 }
 
-export default async function Page({ searchParams }: Props) {
+export default function Page({ searchParams }: Props) {
   const page = searchParams.page ? parseInt(searchParams.page) : 1
   const limit = searchParams.limit ? parseInt(searchParams.limit) : 12
 
@@ -37,8 +37,8 @@ export default async function Page({ searchParams }: Props) {
   return (
     <>
       <Title title='Tienda' subtitle='Todos los productos' />
-      <ProductGrid products={[]} />
-      <Pagination  totalPages={1} />
+      {/* <ProductGrid products={[]} />
+      <Pagination  totalPages={1} /> */}
     </>
   )
 }
